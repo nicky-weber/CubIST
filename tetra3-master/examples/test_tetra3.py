@@ -13,9 +13,22 @@ from pathlib import Path
 t3 = Tetra3('default_database')
 
 # Path where images are
+import csv
+file = open('solution_12_deg_tetra3.csv', 'w')
+csv_cols = ['Image', 'RA', 'Dec', 'Roll', 'FOV', 'RMSE', 'Matches', 'Prob', 'T_solve', 'T_extract']
+writer = csv.DictWriter(file, fieldnames=csv_cols)
+writer.writeheader()
+
 path = Path('../test_data/')
 for impath in path.glob('*.tiff'):
     print('Solving for image at: ' + str(impath))
     with Image.open(str(impath)) as img:
         solved = t3.solve_from_image(img)  # Adding e.g. fov_estimate=11.4, fov_max_error=.1 improves performance
     print('Solution: ' + str(solved))
+    im_name = {'Image': str(impath)}
+    solved.update(im_name)
+
+    for value in [solved]:
+        writer.writerow(value)
+
+file.close()
