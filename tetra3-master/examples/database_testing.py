@@ -1,20 +1,19 @@
-"""
-This example loads the tetra3 default database and solves for every image in the tetra3/test_data directory.
-
-Note: Requires PIL (pip install Pillow)
-"""
 import sys
 sys.path.append('..')
 from tetra3 import Tetra3
 from PIL import Image
 from pathlib import Path
 
-# Create instance and load default_database (built with max_fov=12 and the rest as default)
-t3 = Tetra3('default_database')
+# Create instance
+t3 = Tetra3()
+# Generate and save database
+t3.generate_database(max_fov=12, save_as='my_database_name')
+
+t3 = Tetra3('my_database_name');
 
 # Path where images are
 import csv
-file = open('solution_12_deg_tetra3.csv', 'w')
+file = open('solution_' + str(max_fov) + '_deg_tetra3.csv', 'w')
 csv_cols = ['Image', 'RA', 'Dec', 'Roll', 'FOV', 'RMSE', 'Matches', 'Prob', 'T_solve', 'T_extract']
 writer = csv.DictWriter(file, fieldnames=csv_cols)
 writer.writeheader()
