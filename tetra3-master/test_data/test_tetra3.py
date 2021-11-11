@@ -13,7 +13,7 @@ from pathlib import Path
 t3 = Tetra3('default_database')
 
 # Path where images are
-path = Path('../test_data/')
+path = Path('../test_data/Tetra Given Images')
 for impath in path.glob('*.tiff'):
     print('Solving for image at: ' + str(impath))
     with Image.open(str(impath)) as img:
