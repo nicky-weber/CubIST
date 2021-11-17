@@ -18,8 +18,8 @@ for impath in path.glob('*.tiff'):
     print('Solving for image at: ' + str(impath))
     with Image.open(str(impath)) as img:
         solved = t3.solve_from_image(img, crop=None, downsample=None)#, fov_estimate=11.4, fov_max_error=0.1)  # Adding e.g. fov_estimate=11.4, fov_max_error=.1 improves performance
-    #print('Solution: ' + str(list(solved.items())[:-1]))
-    print('solved:'+str(solved))
+    print('Solution: ' + str(list(solved.items())[:-1]))
+   # print('solved:'+str(solved))
 sol=list(solved.items())
 # extract centroids and organize into array
 centroids=sol[-1]
@@ -45,4 +45,5 @@ t_extract=float(t_extract[1:-2])
 t_tot=t_solve+t_extract# total time
 
 solved = t3.solve_from_image_tracking(img,slew_rate_bound=2,time_for_last_solution=t_tot/1000,star_centroids_last=star_centroids)
-print('Solution Tracking: ',str(solved))
+#print('Solution Tracking: ',str(solved))
+print('Solution Tracking: ' + str(list(solved.items())[:-1]))
