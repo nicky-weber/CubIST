@@ -655,8 +655,10 @@ class Tetra3():
         # Run star extraction, passing kwargs along
         t0_extract = precision_timestamp()
         star_centroids = get_centroids_from_image(image, max_returned=num_stars, **kwargs)
+        print(star_centroids)
+        print(np.size(star_centroids))
         t_extract = (precision_timestamp() - t0_extract)*1000
-
+    
         def compute_vectors(star_centroids, fov):
             """Get unit vectors from star centroids (pinhole camera)."""
             # compute list of (i,j,k) vectors given list of (y,x) star centroids and
@@ -927,24 +929,24 @@ class Tetra3():
         # convert slew rate to radians/s
         slew_rate_bound = slew_rate_bound/57.295779513
         pixel_bounds=2*(slew_rate_bound*1/20)/rad_per_pixel
-        print('pixel bounds:' +str(pixel_bounds))
+        #print('pixel bounds:' +str(pixel_bounds))
         # for all previous identified stars extract
         # define center
         center=[height/2,width/2]
-        print('center:'+str(center))
+        #print('center:'+str(center))
         star_centroids=[]
         for i in range(int(len(star_centroids_last)/2)):
             right = star_centroids_last[i*2]
             down = star_centroids_last[i*2+1]
             # offset
             # define offsets relative to center
-            print('last centroid: '+str(right)+' '+str(down))
+           # print('last centroid: '+str(right)+' '+str(down))
             
             offset_down= (float(right))-center[0]
             offset_right = (float(down))-center[1]
             
-            print('offset down:'+str(offset_down))
-            print('offset right:'+str(offset_right))
+           # print('offset down:'+str(offset_down))
+           # print('offset right:'+str(offset_right))
             # combine
             crop=(pixel_bounds,pixel_bounds,offset_down,offset_right)
             
@@ -952,22 +954,34 @@ class Tetra3():
             #crop=round(crop)
             image_tracking = crop_and_downsample_image(image, crop=crop,downsample=None,sum_when_downsample=True, return_offsets=False)
             star = get_centroids_from_image(image_tracking, max_returned=num_stars, **kwargs)
-            print('get centroid from image output : '+str(star))
-            print(type(star))
+           # print('get centroid from image output : '+str(star))
+           # print(type(star))
+           # print(star)
             # NEED TO UNDO SHIFT FROM CROPPING
             j=0
             star_centroid = []
             for (star_y, star_x) in star:
                 #star_centroid = np.append(star_centroid,[star_y+float(down)-(pixel_bounds/2),star_x+float(right)-(pixel_bounds/2)])
-                star_centroid = np.append(star_centroid,[[star_x+float(right)-(pixel_bounds/2),star_y+float(down)-(pixel_bounds/2)]])
+                #star_centroid = np.append(star_centroid,[[star_x+float(right)-(pixel_bounds/2),star_y+float(down)-(pixel_bounds/2)]])
+                star_centroid.append([star_x+float(right)-(pixel_bounds/2),star_y+float(down)-(pixel_bounds/2)])
                 #star_centroid[i+1] = star_x+center[1]-offset_right-(pixel_bounds/2)
                 #i=i+2
                 j=j+1
-            print('star centroid: ' + str(star_centroid))
-            star_centroids=np.append([star_centroids],[star_centroid])
-            
-           
-        print(star_centroids)
+           # print('star centroid: ' + str(star_centroid))
+            #star_centroids = np.append(star_centroids,star_centroid)
+            star_centroids.append(star_centroid)
+            #star_centroids= star_centroids.tolist()
+            #star_centroids['star_centroids']=star_centroid
+        star_centroids = np.array(star_centroids)
+        star=np.eye(len(star_centroids),2)
+        testing = []
+        for i in range(len(star_centroids)):
+            testing = star_centroids[i][0]
+            star[i]=testing
+            #star=np.append(star,star_centroids[i][0])
+        star_centroids=star
+        #print(star)
+       # print(star_centroids[1][0][1])
         t_extract = (precision_timestamp() - t0_extract)*1000
 
         def compute_vectors(star_centroids, fov):

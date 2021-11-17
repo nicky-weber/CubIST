@@ -43,6 +43,6 @@ t_extract=sol[8]
 t_extract=str(t_extract[1:])
 t_extract=float(t_extract[1:-2])
 t_tot=t_solve+t_extract# total time
-## CENTROID COORDS DEFINED FROM TOP LEFT NOT BOTTOM LEFT MUST FIX: centroid correction is incorrect
+
 solved = t3.solve_from_image_tracking(img,slew_rate_bound=2,time_for_last_solution=t_tot/1000,star_centroids_last=star_centroids)
 print('Solution Tracking: ',str(solved))
