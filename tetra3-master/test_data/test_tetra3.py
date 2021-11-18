@@ -13,8 +13,8 @@ from pathlib import Path
 t3 = Tetra3('default_database')
 
 # Path where images are
-path = Path('../test_data/')
-for impath in path.glob('*.jpg'):
+path = Path('../test_data/Tetra Given Images')
+for impath in path.glob('*.tiff'):
     print('Solving for image at: ' + str(impath))
     with Image.open(str(impath)) as img:
         solved = t3.solve_from_image(img, crop=None, downsample=None)#, fov_estimate=11.4, fov_max_error=0.1)  # Adding e.g. fov_estimate=11.4, fov_max_error=.1 improves performance
