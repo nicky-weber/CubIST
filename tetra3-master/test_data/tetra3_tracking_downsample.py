@@ -923,7 +923,7 @@ class Tetra3():
         if height>width:
             rad_per_pixel=fov_estimate/height
         else:
-            rad_per_pixel=fov_estimate/width
+            rad_per_pixel=fov_estimate/height
         # use rad_per_pixel with slew rate bound, time for last solution * 2 for both direction slew
         # convert slew rate to radians/s
         slew_rate_bound = slew_rate_bound/57.295779513
@@ -971,6 +971,8 @@ class Tetra3():
             star_centroids.append(star_centroid)
             #star_centroids= star_centroids.tolist()
             #star_centroids['star_centroids']=star_centroid
+        # remove empty centroids
+        star_centroids=list(filter(None,star_centroids))
         star_centroids = np.array(star_centroids)
         star=np.eye(len(star_centroids),2)
         testing = []
@@ -1001,7 +1003,7 @@ class Tetra3():
                 vec = np.array([i, j, k])
                 star_vectors.append(vec)
             return star_vectors
-        
+
         t0_solve = precision_timestamp()
         for image_centroids in _generate_patterns_from_centroids(
                                             star_centroids[:pattern_checking_stars], p_size):
