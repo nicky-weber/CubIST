@@ -991,8 +991,11 @@ def get_centroids_from_image(image, sigma=3, image_th=None, crop=None, downsampl
     if return_images:
         images_dict = {'converted_input': image.copy()}
     # 2 Crop and downsample
+    t0_s = precision_timestamp()
     (image, offs) = crop_and_downsample_image(image, crop=crop, downsample=downsample,
                                               return_offsets=True, sum_when_downsample=True)
+    t_s = (precision_timestamp() - t0_s) * 1000
+    print('t_crop_and_downsample : '+str(t_s)+' ms')
     (height, width) = image.shape
     (offs_h, offs_w) = offs
     if return_images:
