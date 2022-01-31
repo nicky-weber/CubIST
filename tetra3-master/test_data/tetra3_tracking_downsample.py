@@ -117,8 +117,12 @@ def quat_generator (c313):
 
     q = np.vstack([q1,q2,q3,q4])
     #quat = np.transpose(q)
+    print(' ')
+    print('-----------------------------')
     print('Quaternion:')
     print(q)
+    print('-----------------------------')
+    print(' ')
     return q
 #----------------- base tetra3 functions --------------------------
 
@@ -870,7 +874,7 @@ class Tetra3():
                         self._logger.debug('RESID: %.2f' % residual + ' asec')
                         c313 = dcm_generator (roll, ra, dec)
                         kumquat = quat_generator(c313)
-                        print(c313)
+                        #print(c313)
                         return {'RA': ra, 'Dec': dec, 'Roll': roll, 'FOV': np.rad2deg(fov),
                                 'RMSE': residual, 'Matches': len(match_tuples),
                                 'Prob': prob_mismatch, 'T_solve': t_solve, 'T_extract': t_extract,'Star Centroids' :star_centroids.tolist()}
@@ -1200,7 +1204,7 @@ class Tetra3():
                         self._logger.debug('RESID: %.2f' % residual + ' asec')
 #---------------------------- quaternion return --------------------------------
                         c313 = dcm_generator (roll, ra, dec)
-                        print(c313)
+                        #print(c313)
                         kumquat = quat_generator(c313)
                         #print('quaternion:' +str(kumquat))
                         return {'RA': ra, 'Dec': dec, 'Roll': roll, 'FOV': np.rad2deg(fov),
