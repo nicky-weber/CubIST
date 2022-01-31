@@ -25,9 +25,9 @@ def dcm_generator (phi, alpha, delta):
     c3_2 = np.array([[math.cos(alpha),math.sin(alpha),0],[-1*math.sin(alpha),math.cos(alpha),0],[0,0,1]])
 
     #multiply 313 sequence in 2 steps 3*1 then (3*1)*3_2
-    int = np.matmul(c3_2,c1)
+    int = np.matmul(c3,c1)
 
-    c313 = np.matmul(int,c3)
+    c313 = np.matmul(int,c3_2)
 
 
     #print(c313)
