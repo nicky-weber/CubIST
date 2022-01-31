@@ -77,17 +77,52 @@ import itertools
 from time import perf_counter as precision_timestamp
 from datetime import datetime
 
+
 # External imports:
 import numpy as np
 from numpy.linalg import norm
 import scipy.ndimage
 import scipy.optimize
 import scipy.stats
+import math
 
 
 _MAGIC_RAND = 2654435761
 
+#----------------- functions for quaternions --------------------------
+#Create the dcm
+def dcm_generator (phi, alpha, delta):
+    phi = math.radians(phi)
+    alpha = math.radians(alpha)
+    delta = math.radians(delta)
 
+    c1 = np.array([[1,0,0],[0,math.cos(delta),math.sin(delta)],[0,-1*math.sin(delta),math.cos(delta)]])
+    c3 = np.array([[math.cos(phi),math.sin(phi),0],[-1*math.sin(phi),math.cos(phi),0],[0,0,1]])
+    c3_2 = np.array([[math.cos(alpha),math.sin(alpha),0],[-1*math.sin(alpha),math.cos(alpha),0],[0,0,1]])
+
+    #multiply 313 sequence in 2 steps 3*1 then (3*1)*3_2
+    int = np.matmul(c3,c1)
+
+    c313 = np.matmul(int,c3_2)
+
+    #print(c313)
+    return c313
+
+#Return the quaternion
+def quat_generator (c313):
+    #math conversion is easier than eigenvalue conversion. Both return the same thing
+    Q = c313
+    q4 = 0.5*(math.sqrt((1+ Q[0][0] + Q[1][1] + Q[2][2])))
+    q1 = (Q[1][2] - Q[2][1])/(4*q4)
+    q2 = (Q[2][0] - Q[0][2])/(4*q4)
+    q3 = (Q[0][1] - Q[1][0])/(4*q4)
+
+    q = np.vstack([q1,q2,q3,q4])
+    #quat = np.transpose(q)
+    print('Quaternion:')
+    print(q)
+    return q
+#----------------- base tetra3 --------------------------
 def _insert_at_index(item, index, table):
     """Inserts to table with quadratic probing."""
     max_ind = table.shape[0]
@@ -417,7 +452,7 @@ class Tetra3():
         path = Path(__file__).parent / 'BSC5'
         print(path)
         with open(path, 'rb') as bsc5_file:
-        
+
             # skip first 28 header bytes
             bsc5_file.seek(28)
             # read BSC5 catalog into array
@@ -629,11 +664,11 @@ class Tetra3():
                 dictionary except 'T_solve' and 'T_exctract'.
         """
         assert self.has_database, 'No database loaded'
-        
-   
+
+
         # Specify the data type so that
         # float value will be converted to int
-        
+
         image = np.asarray(image)
         if fov_estimate is None:
             fov_estimate = np.deg2rad(self._db_props['max_fov'])
@@ -657,7 +692,7 @@ class Tetra3():
         star_centroids = get_centroids_from_image(image, max_returned=num_stars, **kwargs)
         print(np.size(star_centroids))
         t_extract = (precision_timestamp() - t0_extract)*1000
-    
+
         def compute_vectors(star_centroids, fov):
             """Get unit vectors from star centroids (pinhole camera)."""
             # compute list of (i,j,k) vectors given list of (y,x) star centroids and
@@ -891,11 +926,11 @@ class Tetra3():
                 dictionary except 'T_solve' and 'T_exctract'.
         """
         assert self.has_database, 'No database loaded'
-        
-   
+
+
         # Specify the data type so that
         # float value will be converted to int
-        
+
         image = np.asarray(image)
         if fov_estimate is None:
             fov_estimate = np.deg2rad(self._db_props['max_fov'])
@@ -916,7 +951,7 @@ class Tetra3():
         p_max_err = self._db_props['pattern_max_error']
         # Run star extraction, passing kwargs along
         t0_extract = precision_timestamp()
-        # figure out offset from previous solution 
+        # figure out offset from previous solution
         # which ever is greater divide by FOV estimate
         #image=crop_and_downsample_image(image,crop=None,downsample=downsample) # if downsample with tracking
         height, width = image.shape[0:2]
@@ -940,15 +975,15 @@ class Tetra3():
             # offset
             # define offsets relative to center
            # print('last centroid: '+str(right)+' '+str(down))
-            
+
             offset_down= (float(right))-center[0]
             offset_right = (float(down))-center[1]
-            
+
            # print('offset down:'+str(offset_down))
            # print('offset right:'+str(offset_right))
             # combine
             crop=(pixel_bounds,pixel_bounds,offset_down,offset_right)
-            
+
             #make sure it is whole numbers
             #crop=round(crop)
             image_tracking = crop_and_downsample_image(image, crop=crop,downsample=None,sum_when_downsample=True, return_offsets=False)
