@@ -649,6 +649,7 @@ class Tetra3():
         # Run star extraction, passing kwargs along
         t0_extract = precision_timestamp()
         star_centroids = get_centroids_from_image(image, max_returned=num_stars, **kwargs)
+        print(star_centroids)
         t_extract = (precision_timestamp() - t0_extract)*1000
 
         def compute_vectors(star_centroids, fov):

@@ -13,11 +13,11 @@ import numpy as np
 t3 = Tetra3('default_database')
 
 # Path where images are
-path = Path('../test_data/Downsample - 2/')
-for impath in path.glob('*.tiff'):
+path = Path('../test_data/Tracking/')
+for impath in path.glob('*.png'):
     print('Solving for image at: ' + str(impath))
     with Image.open(str(impath)) as img:
-        img = crop_and_downsample_image(img,crop=None,downsample=2)
+        # img = crop_and_downsample_image(img,crop=None,downsample=None)
         solved = t3.solve_from_image(img, crop=None, downsample=None)#, fov_estimate=11.4, fov_max_error=0.1)  # Adding e.g. fov_estimate=11.4, fov_max_error=.1 improves performance
     print('Solution: ' + str(list(solved.items())[:-1]))
     
@@ -44,6 +44,8 @@ for impath in path.glob('*.tiff'):
     t_extract=str(t_extract[1:])
     t_extract=float(t_extract[1:-2])
     t_tot=t_solve+t_extract# total time
-    
+
+for impath in path.glob('*tracking.jpg'):
+    print('Solving for image at: ' + str(impath))
     solved = t3.solve_from_image_tracking(img,slew_rate_bound=2,time_for_last_solution=t_tot/1000,star_centroids_last=star_centroids)
     print('Solution Tracking: ' + str(list(solved.items())[:-1]))
