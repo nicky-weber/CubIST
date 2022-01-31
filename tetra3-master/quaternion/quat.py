@@ -25,9 +25,10 @@ def dcm_generator (phi, alpha, delta):
     c3_2 = np.array([[math.cos(alpha),math.sin(alpha),0],[-1*math.sin(alpha),math.cos(alpha),0],[0,0,1]])
 
     #multiply 313 sequence in 2 steps 3*1 then (3*1)*3_2
-    int = np.matmul(c3,c1)
+    int = np.matmul(c3_2,c1)
 
-    c313 = np.matmul(int,c3_2)
+    c313 = np.matmul(int,c3)
+
 
     #print(c313)
     return c313
@@ -50,9 +51,9 @@ def quat_generator (c313):
 #-------------------- main ---------------------------
 
 #define phi alpha and delta for testing
-phi = 303.4 #degrees
-alpha = 172.368
-delta = 57.65
+phi = 329 #degrees
+alpha = 240.5
+delta = 28.9
 
 c313 = dcm_generator (phi, alpha, delta)
 kumquat = quat_generator(c313)
