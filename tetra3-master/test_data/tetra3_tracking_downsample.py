@@ -868,6 +868,8 @@ class Tetra3():
                         self._logger.debug('MATCH: %i' % len(match_tuples) + ' stars')
                         self._logger.debug('SOLVE: %.2f' % round(t_solve, 2) + ' ms')
                         self._logger.debug('RESID: %.2f' % residual + ' asec')
+                        c313 = dcm_generator (roll, ra, dec)
+                        kumquat = quat_generator(c313)
                         return {'RA': ra, 'Dec': dec, 'Roll': roll, 'FOV': np.rad2deg(fov),
                                 'RMSE': residual, 'Matches': len(match_tuples),
                                 'Prob': prob_mismatch, 'T_solve': t_solve, 'T_extract': t_extract,'Star Centroids' :star_centroids.tolist()}
