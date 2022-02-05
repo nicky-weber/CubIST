@@ -13,14 +13,14 @@ import numpy as np
 t3 = Tetra3('default_database')
 
 # Path where images are
-path = Path('../test_data/Tracking/')
-for impath in path.glob('*.png'):
+path = Path('../test_data/Actual Images/Test3_2-4-22/')
+for impath in path.glob('*.bmp'):
     print('Solving for image at: ' + str(impath))
     with Image.open(str(impath)) as img:
         # img = crop_and_downsample_image(img,crop=None,downsample=None)
         solved = t3.solve_from_image(img, crop=None, downsample=None)#, fov_estimate=11.4, fov_max_error=0.1)  # Adding e.g. fov_estimate=11.4, fov_max_error=.1 improves performance
     print('Solution: ' + str(list(solved.items())[:-1]))
-    
+
     sol=list(solved.items())
     # extract centroids and organize into array
     centroids=sol[-1]
