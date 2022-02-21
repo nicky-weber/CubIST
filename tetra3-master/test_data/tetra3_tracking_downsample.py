@@ -94,22 +94,22 @@ def dcm_generator (phi, alpha, delta):
     alpha = math.radians(alpha)
     delta = math.radians(delta)
 
-    c1 = np.array([[1,0,0],[0,math.cos(delta),math.sin(delta)],[0,-1*math.sin(delta),math.cos(delta)]])
+    c2 = np.array([[math.cos(delta),0,-1*math.sin(delta)],[0,1,0],[math.sin(delta),0,math.cos(delta)]])
     c3 = np.array([[math.cos(phi),math.sin(phi),0],[-1*math.sin(phi),math.cos(phi),0],[0,0,1]])
     c3_2 = np.array([[math.cos(alpha),math.sin(alpha),0],[-1*math.sin(alpha),math.cos(alpha),0],[0,0,1]])
 
-    #multiply 313 sequence in 2 steps 3*1 then (3*1)*3_2
-    int = np.matmul(c3,c1)
+    #multiply 313 sequence in 2 steps 3*2 then (3*2)*3_2
+    int = np.matmul(c3,c2)
 
-    c313 = np.matmul(int,c3_2)
+    c323 = np.matmul(int,c3_2)
 
     #print(c313)
-    return c313
+    return c323
 
 #Return the quaternion
-def quat_generator (c313):
+def quat_generator (c323):
     #math conversion is easier than eigenvalue conversion. Both return the same thing
-    Q = c313
+    Q = c323
     q4 = 0.5*(math.sqrt((1+ Q[0][0] + Q[1][1] + Q[2][2])))
     q1 = (Q[1][2] - Q[2][1])/(4*q4)
     q2 = (Q[2][0] - Q[0][2])/(4*q4)
