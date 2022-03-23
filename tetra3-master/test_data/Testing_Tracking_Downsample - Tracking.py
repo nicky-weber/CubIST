@@ -10,10 +10,10 @@ from PIL import Image
 from pathlib import Path
 import numpy as np
 # Create instance and load default_database (built with max_fov=12 and the rest as default)
-t3 = Tetra3('default_database')
+t3 = Tetra3('7')
 
 # Path where images are
-path = Path('../test_data/Actual Images/Test3_2-4-22/')
+path = Path('../test_data/Actual Images/Test2_2-4-22')
 for impath in path.glob('*.bmp'):
     print('Solving for image at: ' + str(impath))
     with Image.open(str(impath)) as img:
