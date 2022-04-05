@@ -416,7 +416,7 @@ class Tetra3():
         path = Path(__file__).parent / 'BSC5'
         print(path)
         with open(path, 'rb') as bsc5_file:
-        
+
             # skip first 28 header bytes
             bsc5_file.seek(28)
             # read BSC5 catalog into array
@@ -649,6 +649,7 @@ class Tetra3():
         # Run star extraction, passing kwargs along
         t0_extract = precision_timestamp()
         star_centroids = get_centroids_from_image(image, max_returned=num_stars, **kwargs)
+        #print(star_centroids)
         t_extract = (precision_timestamp() - t0_extract)*1000
 
         def compute_vectors(star_centroids, fov):
