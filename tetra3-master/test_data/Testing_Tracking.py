@@ -10,11 +10,11 @@ from PIL import Image
 from pathlib import Path
 import numpy as np
 # Create instance and load default_database (built with max_fov=12 and the rest as default)
-t3 = Tetra3('default_database')
+t3 = Tetra3('7')
 
 # Path where images are
-path = Path('../test_data/Tetra Given Images/')
-for impath in path.glob('*.tiff'):
+path = Path('../test_data/Actual Images/')
+for impath in path.glob('*.bmp'):
     print('Solving for image at: ' + str(impath))
     with Image.open(str(impath)) as img:
         solved = t3.solve_from_image(img, crop=None, downsample=None)#, fov_estimate=11.4, fov_max_error=0.1)  # Adding e.g. fov_estimate=11.4, fov_max_error=.1 improves performance

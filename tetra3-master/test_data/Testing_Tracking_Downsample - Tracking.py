@@ -14,7 +14,7 @@ t3 = Tetra3('default_database')
 
 # Path where images are
 path = Path('../test_data/Tracking/')
-for impath in path.glob('*.png'):
+for impath in path.glob('*.bmp'):
     print('Solving for image at: ' + str(impath))
     with Image.open(str(impath)) as img:
         # img = crop_and_downsample_image(img,crop=None,downsample=None)
@@ -45,7 +45,7 @@ for impath in path.glob('*.png'):
     t_extract=float(t_extract[1:-2])
     t_tot=t_solve+t_extract# total time
 
-for impath in path.glob('*tracking.jpg'):
-    print('Solving for image at: ' + str(impath))
+for impath in path.glob('*tracking.bmp'):
+    print('Tracking Solving for image at: ' + str(impath))
     solved = t3.solve_from_image_tracking(img,slew_rate_bound=2,time_for_last_solution=t_tot/1000,star_centroids_last=star_centroids)
     print('Solution Tracking: ' + str(list(solved.items())[:-1]))

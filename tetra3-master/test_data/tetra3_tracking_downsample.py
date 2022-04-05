@@ -897,6 +897,8 @@ class Tetra3():
         # float value will be converted to int
         
         image = np.asarray(image)
+        # image is comming out as 3d instead of 2d
+        image = image[:,:,0] # remove 3rd dimension
         if fov_estimate is None:
             fov_estimate = np.deg2rad(self._db_props['max_fov'])
         else:
@@ -918,7 +920,7 @@ class Tetra3():
         t0_extract = precision_timestamp()
         # figure out offset from previous solution 
         # which ever is greater divide by FOV estimate
-        #image=crop_and_downsample_image(image,crop=None,downsample=downsample) # if downsample with tracking
+        
         height, width = image.shape[0:2]
         if height>width:
             rad_per_pixel=fov_estimate/height
@@ -928,24 +930,24 @@ class Tetra3():
         # convert slew rate to radians/s
         slew_rate_bound = slew_rate_bound/57.295779513
         pixel_bounds=2*(slew_rate_bound*1/20)/rad_per_pixel
-        #print('pixel bounds:' +str(pixel_bounds))
+        
         # for all previous identified stars extract
         # define center
         center=[height/2,width/2]
-        #print('center:'+str(center))
+        
         star_centroids=[]
+        deltaxi=[]
+        deltayi=[]
+
         for i in range(int(len(star_centroids_last)/2)):
             right = star_centroids_last[i*2]
             down = star_centroids_last[i*2+1]
             # offset
             # define offsets relative to center
-           # print('last centroid: '+str(right)+' '+str(down))
             
             offset_down= (float(right))-center[0]
             offset_right = (float(down))-center[1]
             
-           # print('offset down:'+str(offset_down))
-           # print('offset right:'+str(offset_right))
             # combine
             crop=(pixel_bounds,pixel_bounds,offset_down,offset_right)
             
@@ -953,24 +955,76 @@ class Tetra3():
             #crop=round(crop)
             image_tracking = crop_and_downsample_image(image, crop=crop,downsample=None,sum_when_downsample=True, return_offsets=False)
             star = get_centroids_from_image(image_tracking, max_returned=num_stars, **kwargs)
-           # print('get centroid from image output : '+str(star))
-           # print(type(star))
-           # print(star)
+            deltaxi.append([star[0][0]-0.5*pixel_bounds])
+            deltayi.append([star[0][1]-0.5*pixel_bounds])
             # NEED TO UNDO SHIFT FROM CROPPING
             j=0
             star_centroid = []
             for (star_y, star_x) in star:
-                #star_centroid = np.append(star_centroid,[star_y+float(down)-(pixel_bounds/2),star_x+float(right)-(pixel_bounds/2)])
-                #star_centroid = np.append(star_centroid,[[star_x+float(right)-(pixel_bounds/2),star_y+float(down)-(pixel_bounds/2)]])
                 star_centroid.append([star_x+float(right)-(pixel_bounds/2),star_y+float(down)-(pixel_bounds/2)])
-                #star_centroid[i+1] = star_x+center[1]-offset_right-(pixel_bounds/2)
-                #i=i+2
                 j=j+1
            # print('star centroid: ' + str(star_centroid))
             #star_centroids = np.append(star_centroids,star_centroid)
             star_centroids.append(star_centroid)
             #star_centroids= star_centroids.tolist()
             #star_centroids['star_centroids']=star_centroid
+        
+        deltax=np.mean(deltaxi)# overall average shift in image
+        deltay=np.mean(deltayi)
+
+        #Bounding Boxes of unsearched areas: as defined by average shift in image 
+        Ybx=width
+        Yby=np.abs(deltay)
+
+        Xbx=np.abs(deltax)
+        Xby=height-np.abs(deltay)
+
+        # Center of unsearched areas: as defined by average shift in image
+        Ycx=0.5*width
+        if deltay>=0:
+            Ycy=0.5*deltay
+            Xcy=0.5*(height-deltay)+deltay
+        else:
+            Ycy=height+0.5*deltay
+            Xcy=0.5*(height+deltay)
+        if deltax>=0:
+            Xcx=0.5*deltax
+        else:
+            Xcx=width-0.5*deltax
+
+        # Search the unsearch areas
+        offset_downy = Ycy-center[0]
+        offset_righty = Ycx-center[1]
+        offset_downx = Xcy-center[0]
+        offset_rightx = Xcx-center[1]
+
+        # box defined by y shift
+        crop=(Yby,Ybx,offset_downy,offset_righty)# offsets defined from center
+        image_tracking = crop_and_downsample_image(image, crop=crop,downsample=None,sum_when_downsample=True, return_offsets=False)
+        star = get_centroids_from_image(image_tracking, max_returned=num_stars, **kwargs)
+
+        # NEED TO UNDO SHIFT FROM CROPPING
+        j=0
+        star_centroid = []
+        for (star_y, star_x) in star:
+            star_centroid.append([star_x+Ycy-(Yby/2),star_y+Ycx-(Ybx/2)])
+            j=j+1
+        star_centroids.append(star_centroid)
+
+        # box defined by x shift
+        crop=(Xby,Xbx,offset_downx,offset_rightx)
+        image_tracking = crop_and_downsample_image(image, crop=crop,downsample=None,sum_when_downsample=True, return_offsets=False)
+        star = get_centroids_from_image(image_tracking, max_returned=num_stars, **kwargs)
+
+        # NEED TO UNDO SHIFT FROM CROPPING
+        j=0
+        star_centroid = []
+        for (star_y, star_x) in star:
+            star_centroid.append([star_x+Xcy-(Xby/2),star_y+Xcx-(Xbx/2)])
+            j=j+1
+        star_centroids.append(star_centroid)
+
+
         # remove empty centroids
         star_centroids=list(filter(None,star_centroids))
         star_centroids = np.array(star_centroids)
@@ -979,10 +1033,7 @@ class Tetra3():
         for i in range(len(star_centroids)):
             testing = star_centroids[i][0]
             star[i]=testing
-            #star=np.append(star,star_centroids[i][0])
         star_centroids=star
-        #print(star)
-       # print(star_centroids[1][0][1])
         t_extract = (precision_timestamp() - t0_extract)*1000
 
         def compute_vectors(star_centroids, fov):
