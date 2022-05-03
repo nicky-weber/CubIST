@@ -13,7 +13,7 @@ from pathlib import Path
 t3 = Tetra3('7')
 
 # Path where images are
-path = Path('../test_data/Actual Images/Boulder_3_14_Orion/ORION/')
+path = Path('../test_data/Actual Images/Bortle4_Vail_3-13-2022')
 for impath in path.glob('*.bmp'):
     print('Solving for image at: ' + str(impath))
     with Image.open(str(impath)) as img:
