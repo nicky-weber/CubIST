@@ -5,7 +5,7 @@
 # use tetra3 code to solve
 import sys
 sys.path.append('..')
-from tetra3_tracking_downsample import Tetra3, crop_and_downsample_image
+from tetra3_tracking import Tetra3, crop_and_downsample_image
 from PIL import Image
 from pathlib import Path
 import numpy as np
@@ -17,7 +17,7 @@ path = Path('../test_data/Actual Images/Test2_2-4-22/')
 for impath in path.glob('*.bmp'):
     print('Solving for image at: ' + str(impath))
     with Image.open(str(impath)) as img:
-        img = crop_and_downsample_image(img,crop=None,downsample=2)
+        #img = crop_and_downsample_image(img,crop=None,downsample=None)
         solved = t3.solve_from_image(img, crop=None, downsample=None)#, fov_estimate=11.4, fov_max_error=0.1)  # Adding e.g. fov_estimate=11.4, fov_max_error=.1 improves performance
     print('Solution: ' + str(list(solved.items())[:-1]))
 

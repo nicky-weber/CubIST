@@ -897,8 +897,10 @@ class Tetra3():
         # float value will be converted to int
         
         image = np.asarray(image)
-        # image is comming out as 3d instead of 2d
-        image = image[:,:,0] # remove 3rd dimension
+        # image is comming out as 3d instead of 2d]
+        if image.ndim== 3:
+            image = image[:,:,0]# remove 3rd dimension  ONLY USE FOR .bmp PHOTOS
+        
         if fov_estimate is None:
             fov_estimate = np.deg2rad(self._db_props['max_fov'])
         else:
@@ -955,8 +957,9 @@ class Tetra3():
             #crop=round(crop)
             image_tracking = crop_and_downsample_image(image, crop=crop,downsample=None,sum_when_downsample=True, return_offsets=False)
             star = get_centroids_from_image(image_tracking, max_returned=num_stars, **kwargs)
-            deltaxi.append([star[0][0]-0.5*pixel_bounds])
-            deltayi.append([star[0][1]-0.5*pixel_bounds])
+            if len(star) > 0:
+                deltaxi.append([star[0][0]-0.5*pixel_bounds])
+                deltayi.append([star[0][1]-0.5*pixel_bounds])
             # NEED TO UNDO SHIFT FROM CROPPING
             j=0
             star_centroid = []
@@ -1576,6 +1579,8 @@ def crop_and_downsample_image(image, crop=None, downsample=None, sum_when_downsa
     # Returned array is same type as input array!
 
     image = np.asarray(image)
+    if image.ndim== 3:
+        image = image[:,:,0]
     assert image.ndim == 2, 'Input must be 2D'
     # Do nothing if both are None
     if crop is None and downsample is None:
