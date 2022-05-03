@@ -83,10 +83,48 @@ from numpy.linalg import norm
 import scipy.ndimage
 import scipy.optimize
 import scipy.stats
-
+import math
 
 _MAGIC_RAND = 2654435761
 
+#----------------- quaternion functions --------------------------
+#Create the dcm
+def dcm_generator (phi, alpha, delta):
+    phi = math.radians(phi)
+    alpha = math.radians(alpha)
+    delta = math.radians(delta)
+
+    c2 = np.array([[math.cos(delta),0,-1*math.sin(delta)],[0,1,0],[math.sin(delta),0,math.cos(delta)]])
+    c3 = np.array([[math.cos(phi),math.sin(phi),0],[-1*math.sin(phi),math.cos(phi),0],[0,0,1]])
+    c3_2 = np.array([[math.cos(alpha),math.sin(alpha),0],[-1*math.sin(alpha),math.cos(alpha),0],[0,0,1]])
+
+    #multiply 323 sequence in 2 steps 3*2 then (3*2)*3_2
+    int = np.matmul(c3,c2)
+
+    c323 = np.matmul(int,c3_2)
+
+    #print(c323)
+    return c323
+
+#Return the quaternion
+def quat_generator (c323):
+    #math conversion is easier than eigenvalue conversion. Both return the same thing
+    Q = c323
+    q4 = 0.5*(math.sqrt((1+ Q[0][0] + Q[1][1] + Q[2][2])))
+    q1 = (Q[1][2] - Q[2][1])/(4*q4)
+    q2 = (Q[2][0] - Q[0][2])/(4*q4)
+    q3 = (Q[0][1] - Q[1][0])/(4*q4)
+
+    q = np.vstack([q1,q2,q3,q4])
+    #quat = np.transpose(q)
+    print(' ')
+    print('-----------------------------')
+    print('Quaternion:')
+    print(q)
+    print('-----------------------------')
+    print(' ')
+    return q
+#----------------- base tetra3 functions --------------------------
 
 def _insert_at_index(item, index, table):
     """Inserts to table with quadratic probing."""
@@ -834,6 +872,9 @@ class Tetra3():
                         self._logger.debug('MATCH: %i' % len(match_tuples) + ' stars')
                         self._logger.debug('SOLVE: %.2f' % round(t_solve, 2) + ' ms')
                         self._logger.debug('RESID: %.2f' % residual + ' asec')
+                        c323 = dcm_generator (roll, ra, dec)
+                        kumquat = quat_generator(c323)
+
                         return {'RA': ra, 'Dec': dec, 'Roll': roll, 'FOV': np.rad2deg(fov),
                                 'RMSE': residual, 'Matches': len(match_tuples),
                                 'Prob': prob_mismatch, 'T_solve': t_solve, 'T_extract': t_extract,'Star Centroids' :star_centroids.tolist()}
@@ -1215,6 +1256,8 @@ class Tetra3():
                         self._logger.debug('MATCH: %i' % len(match_tuples) + ' stars')
                         self._logger.debug('SOLVE: %.2f' % round(t_solve, 2) + ' ms')
                         self._logger.debug('RESID: %.2f' % residual + ' asec')
+                        c323 = dcm_generator (roll, ra, dec)
+                        kumquat = quat_generator(c323)
                         return {'RA': ra, 'Dec': dec, 'Roll': roll, 'FOV': np.rad2deg(fov),
                                 'RMSE': residual, 'Matches': len(match_tuples),
                                 'Prob': prob_mismatch, 'T_solve': t_solve, 'T_extract': t_extract, 'Star Centroids' :star_centroids.tolist()}
