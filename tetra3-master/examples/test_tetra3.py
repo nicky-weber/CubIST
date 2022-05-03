@@ -19,8 +19,8 @@ csv_cols = ['Image', 'RA', 'Dec', 'Roll', 'FOV', 'RMSE', 'Matches', 'Prob', 'T_s
 writer = csv.DictWriter(file, fieldnames=csv_cols)
 writer.writeheader()
 
-path = Path('../test_data/')
-for impath in path.glob('*.tiff'):
+path = Path('../test_data/Actual Images/GI1.png')
+for impath in path.glob('*.png'):
     print('Solving for image at: ' + str(impath))
     with Image.open(str(impath)) as img:
         solved = t3.solve_from_image(img)  # Adding e.g. fov_estimate=11.4, fov_max_error=.1 improves performance
